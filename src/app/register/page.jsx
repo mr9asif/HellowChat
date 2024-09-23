@@ -1,19 +1,56 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 const Regester = () => {
+   const router = useRouter()
+
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-
-  const onSubmit = (data) => {
+  
+  const onSubmit =async (data) => {
     console.log("Form data: ", data);
+  
+    try {
+      const response = await fetch('/api/register', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: data.Email,
+          username: data.Username, // 'username' is more commonly lowercase in APIs
+          password: data.Password
+        })
+      });
+   
+      if (response.status === 201) {
+        console.log("User created");
+        toast.success("User successfully created!")
+         router.push('/login')
+      }else if(response.status === 402){
+         toast.error("User Already Exist")
+      } else {
+        console.log("User failed to create");
+      }
+    } catch (error) {
+      console.log("Internal error", error); // Optionally, log the error for more details
+    }
+    
+  
   };
-
+ const handleToast = () =>{
+    toast.success('click success')
+ }
+   
   return (
     <div className="flex justify-center items-center min-h-screen bg-[oxF6F4F3]">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
@@ -23,7 +60,9 @@ const Regester = () => {
             Hello Chat
           </h1>
         </div>
-
+        <div>
+        <button onClick={handleToast}>Make me</button>
+       </div>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           {/* Username input */}
           <input
@@ -100,9 +139,12 @@ const Regester = () => {
             Login
           </Link>
         </p>
-         
-      </div>
+        </div>
+        
+       
+     
     </div>
+    
   );
 };
 

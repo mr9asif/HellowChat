@@ -1,25 +1,48 @@
 "use client";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 const Login = () => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log("Form data: ", data);
+
+    try {
+      const res = await signIn("credentials", {
+        email: data.Email, // Extract email from data
+        password: data.Password, // Extract password from data
+        redirect: false,
+      });
+
+      if (res?.ok) {
+        console.log("Login successful");
+        console.log(res)
+         toast.success("Login Successfully!")
+        router.push('/')
+      } else {
+        console.log("Invalid credentials");
+        toast.error("Invalid Email or Password")
+      }
+    } catch (error) {
+      console.log("Error:", error);
+    }
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-[oxF6F4F3]">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
-        <div className="flex items-center justify-center  gap-2">
-        <Image src="/images/Logo.png" width={70} height={70} alt="LOGO" />
-
+        <div className="flex items-center justify-center gap-2">
+          <Image src="/images/Logo.png" width={70} height={70} alt="LOGO" />
           <h1 className="text-2xl pt-6 font-bold mb-6 text-orange-500 text-center">Hello Chat</h1>
         </div>
 
@@ -45,9 +68,7 @@ const Login = () => {
           />
           {/* Show password errors */}
           {errors.Password && (
-            <span className="text-red-500 text-sm">
-              {errors.Password.message}
-            </span>
+            <span className="text-red-500 text-sm">{errors.Password.message}</span>
           )}
 
           {/* Submit button */}
@@ -57,7 +78,7 @@ const Login = () => {
             className="bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 cursor-pointer transition duration-300"
           />
         </form>
-        <p className="my-6">don't have an account? <Link href='/regester' className="font-bold cursor-pointer text-xl">regester</Link></p>
+        <p className="my-6">Don't have an account? <Link href='/register' className="font-bold cursor-pointer text-xl">Register</Link></p>
       </div>
     </div>
   );

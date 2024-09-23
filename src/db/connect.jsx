@@ -1,11 +1,15 @@
+
 import mongoose from "mongoose";
 
- const  ConnectDB = async () =>{
+const connectDB = async ()=>{
     try {
-         await mongoose.connect(process.env.MONGODB_URI);
-         console.log("MongoDB Connected")
+        const res = await mongoose.connect("mongodb://0.0.0.0:27017/HellowChat")
+      console.log("mongoose connect successfully")
+         
+
     } catch (error) {
-        console.log('Mongodb error not connect', error)
+        console.log("mongoose connection failed", error)
     }
-}
-export default ConnectDB;
+} 
+
+export default connectDB;
